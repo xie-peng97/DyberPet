@@ -11,6 +11,7 @@ import sqlite3
 from datetime import datetime
 from typing import List, Dict, Optional, Any
 
+# Use PySide6 consistently with the main application
 from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt, QThread, Signal, QTimer, QSize
 from PySide6.QtGui import QFont, QTextCursor, QIcon, QPixmap, QAction

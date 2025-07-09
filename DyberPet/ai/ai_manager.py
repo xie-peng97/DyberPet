@@ -18,27 +18,8 @@ import yaml
 
 import requests
 
-# Qt framework compatibility layer
-try:
-    from PySide6.QtCore import QObject, Signal, QThread, QTimer
-except ImportError:
-    try:
-        from PyQt6.QtCore import QObject, pyqtSignal as Signal, QThread, QTimer
-    except ImportError:
-        # Fallback for testing without Qt
-        class QObject:
-            pass
-        class Signal:
-            def __init__(self, *args, **kwargs):
-                pass
-            def emit(self, *args):
-                pass
-            def connect(self, slot):
-                pass
-        class QThread:
-            pass
-        class QTimer:
-            pass
+# Use PySide6 consistently with the main application
+from PySide6.QtCore import QObject, Signal, QThread, QTimer
 
 from .config import AIConfig
 import DyberPet.settings as settings

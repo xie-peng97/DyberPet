@@ -9,11 +9,13 @@ import os
 import sys
 from typing import Dict, Any, Optional
 
-# Qt framework compatibility layer
+# Use PySide6 consistently with the main application
+from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt, Signal, QThread, QTimer
+from PySide6.QtGui import QFont, QIcon
+
+# Try to import qfluentwidgets, fall back to standard Qt widgets
 try:
-    from PySide6.QtWidgets import *
-    from PySide6.QtCore import Qt, Signal, QThread, QTimer
-    from PySide6.QtGui import QFont, QIcon
     from qfluentwidgets import (
         BodyLabel, PushButton, LineEdit, ComboBox, SwitchButton,
         CardWidget, ScrollArea, VBoxLayout, HBoxLayout, FluentIcon as FIF,
@@ -21,132 +23,53 @@ try:
         FluentStyleSheet, Theme
     )
 except ImportError:
-    try:
-        from PyQt6.QtWidgets import *
-        from PyQt6.QtCore import Qt, pyqtSignal as Signal, QThread, QTimer
-        from PyQt6.QtGui import QFont, QIcon
-        # Fallback widgets for PyQt6
-        class BodyLabel(QLabel):
-            pass
-        class PushButton(QPushButton):
-            pass
-        class LineEdit(QLineEdit):
-            pass
-        class ComboBox(QComboBox):
-            pass
-        class SwitchButton(QCheckBox):
-            pass
-        class CardWidget(QWidget):
-            pass
-        class ScrollArea(QScrollArea):
-            pass
-        class VBoxLayout(QVBoxLayout):
-            pass
-        class HBoxLayout(QHBoxLayout):
-            pass
-        class InfoBar:
-            @staticmethod
-            def success(*args, **kwargs):
-                pass
-            @staticmethod
-            def error(*args, **kwargs):
-                pass
-        class InfoBarPosition:
-            TOP = 0
-        class MessageBox:
-            @staticmethod
-            def information(*args, **kwargs):
-                pass
-        class PasswordLineEdit(QLineEdit):
-            def __init__(self, *args, **kwargs):
-                super().__init__(*args, **kwargs)
-                self.setEchoMode(QLineEdit.EchoMode.Password)
-        class FluentStyleSheet:
-            pass
-        class Theme:
-            pass
-        class FIF:
-            SETTING = None
-            ROBOT = None
-            SAVE = None
-            CANCEL = None
-    except ImportError:
-        # Fallback for testing without Qt
-        class QWidget:
-            def __init__(self, *args, **kwargs):
-                pass
-        class QLabel(QWidget):
-            pass
-        class QPushButton(QWidget):
-            pass
-        class QLineEdit(QWidget):
-            pass
-        class QComboBox(QWidget):
-            pass
-        class QCheckBox(QWidget):
-            pass
-        class QScrollArea(QWidget):
-            pass
-        class QVBoxLayout:
-            pass
-        class QHBoxLayout:
-            pass
-        class BodyLabel(QLabel):
-            pass
-        class PushButton(QPushButton):
-            pass
-        class LineEdit(QLineEdit):
-            pass
-        class ComboBox(QComboBox):
-            pass
-        class SwitchButton(QCheckBox):
-            pass
-        class CardWidget(QWidget):
-            pass
-        class ScrollArea(QScrollArea):
-            pass
-        class VBoxLayout(QVBoxLayout):
-            pass
-        class HBoxLayout(QHBoxLayout):
-            pass
-        class InfoBar:
-            @staticmethod
-            def success(*args, **kwargs):
-                pass
-            @staticmethod
-            def error(*args, **kwargs):
-                pass
-        class InfoBarPosition:
-            TOP = 0
-        class MessageBox:
-            @staticmethod
-            def information(*args, **kwargs):
-                pass
-        class PasswordLineEdit(QLineEdit):
-            pass
-        class FluentStyleSheet:
-            pass
-        class Theme:
-            pass
-        class FIF:
-            SETTING = None
-            ROBOT = None
-            SAVE = None
-            CANCEL = None
-        class Signal:
-            def __init__(self, *args, **kwargs):
-                pass
-            def emit(self, *args):
-                pass
-            def connect(self, slot):
-                pass
-        class QThread:
-            pass
-        class QTimer:
-            pass
-        class Qt:
-            Horizontal = 0
-            Vertical = 1
+    # Fallback to standard Qt widgets
+    class BodyLabel(QLabel):
+        pass
+    class PushButton(QPushButton):
+        pass
+    class LineEdit(QLineEdit):
+        pass
+    class ComboBox(QComboBox):
+        pass
+    class SwitchButton(QCheckBox):
+        pass
+    class CardWidget(QWidget):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.setStyleSheet("QWidget { border: 1px solid #e0e0e0; border-radius: 8px; background-color: #f8f9fa; padding: 10px; }")
+    class ScrollArea(QScrollArea):
+        pass
+    class VBoxLayout(QVBoxLayout):
+        pass
+    class HBoxLayout(QHBoxLayout):
+        pass
+    class InfoBar:
+        @staticmethod
+        def success(title, content, parent=None, **kwargs):
+            QMessageBox.information(parent, title, content)
+        @staticmethod
+        def error(title, content, parent=None, **kwargs):
+            QMessageBox.critical(parent, title, content)
+    class InfoBarPosition:
+        TOP = 0
+    class MessageBox:
+        @staticmethod
+        def information(parent, title, text, **kwargs):
+            QMessageBox.information(parent, title, text)
+    class PasswordLineEdit(QLineEdit):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.setEchoMode(QLineEdit.EchoMode.Password)
+    class FluentStyleSheet:
+        pass
+    class Theme:
+        pass
+    class FIF:
+        SETTING = None
+        ROBOT = None
+        SAVE = None
+        CANCEL = None
 
 from ..ai.config import AIConfig
 from ..ai.ai_manager import AIManager
