@@ -1,0 +1,56 @@
+{
+  "user_id": "",
+  "username": "主人",
+  "created_at": "",
+  "last_updated": "",
+  "preferences": {
+    "ai_enabled": true,
+    "proactive_enabled": true,
+    "emotion_animations": true,
+    "personalization_enabled": true,
+    "learning_enabled": true,
+    "response_style": "casual",
+    "response_length": "medium",
+    "emoji_usage": "normal",
+    "proactive_frequency": "medium",
+    "do_not_disturb_hours": [[23, 8]],
+    "quiet_mode_enabled": false,
+    "data_collection": true,
+    "profile_building": true,
+    "learning_from_feedback": true
+  },
+  "interests": [],
+  "communication_style": "casual",
+  "activity_pattern": {
+    "active_hours": [9, 22],
+    "preferred_interaction_frequency": "medium",
+    "peak_activity_times": []
+  },
+  "emotional_preferences": {
+    "humor_level": 0.7,
+    "formality": 0.3,
+    "supportiveness": 0.8,
+    "playfulness": 0.6
+  },
+  "preferred_topics": [],
+  "response_style_preferences": {
+    "length": 0.5,
+    "emoji_usage": 0.7,
+    "question_frequency": 0.4
+  },
+  "stats": {
+    "total_interactions": 0,
+    "total_ai_responses": 0,
+    "total_proactive_messages": 0,
+    "total_animations_triggered": 0,
+    "positive_feedback": 0,
+    "negative_feedback": 0,
+    "neutral_feedback": 0,
+    "first_interaction": null,
+    "last_interaction": null,
+    "average_session_length": 0.0,
+    "features_used": {}
+  },
+  "tags": [],
+  "notes": ""
+}
