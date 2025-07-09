@@ -885,6 +885,15 @@ class Scheduler_worker(QObject):
         #self.scheduler.add_job(self.change_em, 'interval', minutes=self.pet_conf.em_interval)
         self.scheduler.add_job(self.change_fv, interval.IntervalTrigger(minutes=1)) #self.pet_conf.fv_interval))
         self.scheduler.start()
+        
+        # Initialize AI scheduler integration
+        self.ai_scheduler = None
+        try:
+            from DyberPet.ai.scheduler_integration import AISchedulerIntegration
+            self.ai_scheduler = AISchedulerIntegration(self)
+            print("AI scheduler integration initialized")
+        except ImportError as e:
+            print(f"AI scheduler integration not available: {e}")
 
 
     def run(self):
@@ -1355,6 +1364,25 @@ class Scheduler_worker(QObject):
         
         self.show_dialogue('clock_remind',text_toshow)
     '''
+    
+    def add_todo_reminder(self, task_content: str, reminder_time: datetime) -> dict:
+        """
+        Add a todo reminder using AI scheduler integration
+        
+        Args:
+            task_content: Content of the task
+            reminder_time: When to remind
+            
+        Returns:
+            Dictionary with result status
+        """
+        if self.ai_scheduler:
+            return self.ai_scheduler.add_todo_reminder(task_content, reminder_time)
+        else:
+            return {
+                'status': 'error',
+                'message': 'AI scheduler not available'
+            }
 
         
 

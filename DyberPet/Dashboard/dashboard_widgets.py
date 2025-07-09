@@ -3144,6 +3144,7 @@ class TaskPanel(CardWidget):
     """To-do Task Panel UI"""
 
     addCoins = Signal(int, bool, bool, str, name='addCoins')
+    openAIChat = Signal(name='openAIChat')  # Signal to open AI chat window
 
     def __init__(self, sizeHintDyber, parent=None):
         super().__init__(parent=parent)
@@ -3184,19 +3185,13 @@ class TaskPanel(CardWidget):
         self.taskLabel = StrongBodyLabel(self)
         self.taskLabel.setText(self.tr("To-do Tasks"))
 
-        '''
-        self.addButton = TransparentToolButton(self)
-        self.addButton.setIcon(os.path.join(basedir,'res/icons/Dashboard/add.svg'))
-        self.addButton.setFixedSize(20,20)
-        self.addButton.setIconSize(QSize(20,20))
-        #self.addButton.clicked.connect()
-        
-
-        self.progressButton = TransparentToolButton(self)
-        self.progressButton.setIcon(os.path.join(basedir,'res/icons/Dashboard/progressTask.svg'))
-        self.progressButton.setFixedSize(20,20)
-        self.progressButton.setIconSize(QSize(20,20))
-        '''
+        # AI Chat Button
+        self.aiChatButton = TransparentToolButton(self)
+        self.aiChatButton.setIcon(QIcon(os.path.join(basedir,'res/icons/Dashboard/add.svg')))
+        self.aiChatButton.setFixedSize(20,20)
+        self.aiChatButton.setIconSize(QSize(20,20))
+        self.aiChatButton.setToolTip(self.tr("Open AI Chat"))
+        #self.aiChatButton.clicked.connect()  # Will connect later
 
         self.progressLabel_1 = BodyLabel(self)
         self.progressLabel_1.setText(self.tr("Completed "))
@@ -3211,7 +3206,7 @@ class TaskPanel(CardWidget):
         self.horizontalLayout_1.addWidget(self.taskLabel)
         spacerItem2 = QSpacerItem(10, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         self.horizontalLayout_1.addItem(spacerItem2)
-        #self.horizontalLayout_1.addWidget(self.addButton, 0, Qt.AlignRight)
+        self.horizontalLayout_1.addWidget(self.aiChatButton, 0, Qt.AlignRight)
 
         self.horizontalLayout_1.addWidget(self.progressLabel_1)
         spacerItem3 = QSpacerItem(5, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
@@ -3283,6 +3278,10 @@ class TaskPanel(CardWidget):
 
     def __connectSignalToSlot(self):
         self.emptyCard.new_task.connect(self.addTodoCard)
+        
+        # Connect AI chat button if it exists
+        if hasattr(self, 'aiChatButton'):
+            self.aiChatButton.clicked.connect(self.openAIChat.emit)
 
 
     def addTodoCard(self, task_text, task_id=None):

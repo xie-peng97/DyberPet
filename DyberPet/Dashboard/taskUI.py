@@ -55,6 +55,17 @@ class taskInterface(ScrollArea):
         self.focusPanel = FocusPanel(sizeHintdb, self.scrollWidget)
         self.progressPanel = ProgressPanel(sizeHintdb, self.scrollWidget)
         self.taskPanel = TaskPanel(sizeHintdb, self.scrollWidget)
+        
+        # Import AI components
+        try:
+            from DyberPet.ai.task_panel import AITaskPanel
+            from DyberPet.ai.chat_window import AIChatWindow
+            self.aiTaskPanel = AITaskPanel(sizeHintdb, self.scrollWidget)
+            self.aiChatWindow = None  # Will be created when needed
+        except ImportError as e:
+            print(f"AI components not available: {e}")
+            self.aiTaskPanel = None
+            self.aiChatWindow = None
 
         self.__initWidget()
 
@@ -83,6 +94,10 @@ class taskInterface(ScrollArea):
         self.expandLayout.addWidget(self.focusPanel)
         self.expandLayout.addWidget(self.progressPanel)
         self.expandLayout.addWidget(self.taskPanel)
+        
+        # Add AI task panel if available
+        if self.aiTaskPanel:
+            self.expandLayout.addWidget(self.aiTaskPanel)
 
 
     def __setQss(self):
@@ -98,6 +113,39 @@ class taskInterface(ScrollArea):
         """ connect signal to slot """
         self.focusPanel.addProgress.connect(self.progressPanel.updateProgress)
         self.panelHelp.clicked.connect(self._showInstruction)
+        
+        # Connect AI task panel signals if available
+        if self.aiTaskPanel:
+            self.aiTaskPanel.task_reminder.connect(self._handleAITaskReminder)
+        
+        # Connect AI chat button
+        self.taskPanel.openAIChat.connect(self.showAIChatWindow)
+    
+    def _handleAITaskReminder(self, task_data):
+        """Handle AI task reminder"""
+        # This could trigger bubble notifications or other UI updates
+        print(f"AI task reminder: {task_data}")
+    
+    def showAIChatWindow(self):
+        """Show AI chat window"""
+        if not self.aiChatWindow:
+            try:
+                from DyberPet.ai.chat_window import AIChatWindow
+                self.aiChatWindow = AIChatWindow()
+                # Connect signals
+                self.aiChatWindow.task_created.connect(self._handleAITaskCreated)
+            except ImportError:
+                return
+        
+        self.aiChatWindow.show()
+        self.aiChatWindow.activateWindow()
+    
+    def _handleAITaskCreated(self, task_data):
+        """Handle AI task creation"""
+        print(f"AI task created: {task_data}")
+        # Refresh the AI task panel
+        if self.aiTaskPanel:
+            self.aiTaskPanel.refresh_tasks()
     
     def _changePet(self):
         self.changePet.emit()

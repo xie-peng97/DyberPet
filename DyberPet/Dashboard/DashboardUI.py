@@ -95,6 +95,10 @@ class DashboardMainWindow(FluentWindow):
         self.taskInterface.focusPanel.addCoins.connect(self.backpackInterface.addCoins)
         self.taskInterface.progressPanel.addCoins.connect(self.backpackInterface.addCoins)
         self.taskInterface.taskPanel.addCoins.connect(self.backpackInterface.addCoins)
+        
+        # AI task panel connections
+        if hasattr(self.taskInterface, 'aiTaskPanel') and self.taskInterface.aiTaskPanel:
+            self.taskInterface.aiTaskPanel.addCoins.connect(self.backpackInterface.addCoins)
 
     def show_window(self):
         if self.isVisible():
