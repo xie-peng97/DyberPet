@@ -1,3 +1,4 @@
+
 """
 DyberPet AI Module - Stage 2 Implementation
 Proactive Interaction System for DyberPet
@@ -15,6 +16,10 @@ from .personalization_engine import PersonalizationEngine
 from .learning_system import LearningSystem
 from .user_profile import UserProfile
 from .ai_stage2_integration import AIStage2Integration
+from .ai_manager import AIManager
+from .function_calling import FunctionCallingProcessor
+from .task_manager import TaskManager
+from .file_processor import FileProcessor
 
 __all__ = [
     'ProactiveManager',
@@ -22,5 +27,6 @@ __all__ = [
     'PersonalizationEngine',
     'LearningSystem',
     'UserProfile',
-    'AIStage2Integration'
+    'AIStage2Integration',
+	'AIManager', 'FunctionCallingProcessor', 'TaskManager', 'FileProcessor'
 ]
