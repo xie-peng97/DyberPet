@@ -116,7 +116,7 @@ class EmotionManager(QObject):
         }
         
         # Try to load from YAML file if it exists
-        keywords_file = Path(settings.BASEDIR) / 'DyberPet' / 'data' / 'emotion_keywords.yaml'
+        keywords_file = Path(settings.BASEDIR) / 'DyberPet' / 'ai' / 'templates' / 'emotion_keywords.yaml'
         if keywords_file.exists():
             try:
                 import yaml
@@ -126,6 +126,18 @@ class EmotionManager(QObject):
                         return loaded_keywords
             except Exception as e:
                 self.logger.warning(f"Failed to load emotion keywords from YAML: {e}")
+        
+        # Also try to load from data directory (runtime)
+        runtime_keywords_file = Path(settings.BASEDIR) / 'DyberPet' / 'data' / 'emotion_keywords.yaml'
+        if runtime_keywords_file.exists():
+            try:
+                import yaml
+                with open(runtime_keywords_file, 'r', encoding='utf-8') as f:
+                    loaded_keywords = yaml.safe_load(f)
+                    if loaded_keywords:
+                        return loaded_keywords
+            except Exception as e:
+                self.logger.warning(f"Failed to load emotion keywords from runtime YAML: {e}")
                 
         return default_keywords
         
