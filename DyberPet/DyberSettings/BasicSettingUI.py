@@ -199,6 +199,27 @@ class SettingInterface(ScrollArea):
         )
         self.themeColorCard.colorChanged.connect(self.colorChanged)
 
+        # AI Settings ==============================================================================
+        self.AIGroup = SettingCardGroup(self.tr('AI Settings'), self.scrollWidget)
+        
+        # AI Enable/Disable
+        self.AIEnabledCard = SwitchSettingCard(
+            FIF.ROBOT,
+            self.tr("AI Chat"),
+            self.tr("Enable AI chat functionality with DyberPet"),
+            parent=self.AIGroup
+        )
+        
+        # Load AI config
+        try:
+            from DyberPet.ai.config import AIConfig
+            ai_config = AIConfig()
+            self.AIEnabledCard.setChecked(ai_config.is_enabled())
+        except ImportError:
+            self.AIEnabledCard.setEnabled(False)
+        
+        self.AIEnabledCard.switchButton.checkedChanged.connect(self._AIEnabledChanged)
+
         # About ==============================================================================
         self.aboutGroup = SettingCardGroup(self.tr('About'), self.scrollWidget)
         update_needed, update_text = self._checkUpdate()
@@ -266,6 +287,8 @@ class SettingInterface(ScrollArea):
         self.PersonalGroup.addSettingCard(self.languageCard)
         self.PersonalGroup.addSettingCard(self.themeColorCard)
 
+        self.AIGroup.addSettingCard(self.AIEnabledCard)
+
         self.aboutGroup.addSettingCard(self.aboutCard)
         self.aboutGroup.addSettingCard(self.helpCard)
         self.aboutGroup.addSettingCard(self.devCard)
@@ -278,6 +301,7 @@ class SettingInterface(ScrollArea):
         self.expandLayout.addWidget(self.InteractionGroup)
         self.expandLayout.addWidget(self.VolumnGroup)
         self.expandLayout.addWidget(self.PersonalGroup)
+        self.expandLayout.addWidget(self.AIGroup)
         self.expandLayout.addWidget(self.aboutGroup)
 
     def __setQss(self):
@@ -386,6 +410,14 @@ class SettingInterface(ScrollArea):
         else:
             settings.bubble_on = False
         settings.save_settings()
+
+    def _AIEnabledChanged(self, isChecked):
+        try:
+            from DyberPet.ai.config import AIConfig
+            ai_config = AIConfig()
+            ai_config.set_enabled(isChecked)
+        except ImportError:
+            pass  # AI module not available
 
 
 

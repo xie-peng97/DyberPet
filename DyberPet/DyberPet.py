@@ -638,6 +638,9 @@ class PetWidget(QWidget):
         # 是否跟随鼠标
         self.is_follow_mouse = False
         self.mouse_drag_pos = self.pos()
+        
+        # Initialize AI chat window
+        self.ai_chat_window = None
 
     def ontop_update(self):
         if settings.on_top_hint:
@@ -1014,6 +1017,18 @@ class PetWidget(QWidget):
             Action(QIcon(os.path.join(basedir,'res/icons/dashboard.svg')), self.tr('Dashboard'), triggered=self._show_dashboard),
             Action(QIcon(os.path.join(basedir,'res/icons/SystemPanel.png')), self.tr('System'), triggered=self._show_controlPanel),
         ])
+        
+        # Add AI Chat option if AI is available
+        try:
+            from DyberPet.ai.config import AIConfig
+            ai_config = AIConfig()
+            if ai_config.is_enabled():
+                self.StatMenu.addAction(
+                    Action(QIcon(os.path.join(basedir,'res/icons/dashboard.svg')), self.tr('与DyberPet聊天'), triggered=self._show_ai_chat)
+                )
+        except ImportError:
+            pass  # AI module not available
+        
         self.StatMenu.addSeparator()
 
         self.StatMenu.addMenu(self.act_menu)
@@ -1683,6 +1698,25 @@ class PetWidget(QWidget):
 
     def _show_dashboard(self):
         self.show_dashboard.emit()
+
+    def _show_ai_chat(self):
+        """Show AI chat window."""
+        try:
+            from DyberPet.ai.simple_chat import SimpleChatWindow
+            
+            # Create chat window if it doesn't exist
+            if not hasattr(self, 'ai_chat_window') or self.ai_chat_window is None:
+                self.ai_chat_window = SimpleChatWindow()
+            
+            # Show the chat window
+            self.ai_chat_window.show()
+            self.ai_chat_window.raise_()
+            self.ai_chat_window.activateWindow()
+            
+        except ImportError as e:
+            print(f"AI chat not available: {e}")
+        except Exception as e:
+            print(f"Error opening AI chat: {e}")
 
     '''
     def show_compday(self):
