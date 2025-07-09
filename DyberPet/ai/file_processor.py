@@ -8,6 +8,8 @@ import os
 from typing import Optional, Tuple
 from PySide6.QtCore import QObject, Signal
 
+from .ai_config import ai_config
+
 class FileProcessor(QObject):
     """
     Handles file processing for text summarization
@@ -18,8 +20,8 @@ class FileProcessor(QObject):
     
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.max_file_size = 100 * 1024  # 100KB limit
-        self.supported_extensions = {'.txt'}
+        self.max_file_size = ai_config.get_max_file_size_kb() * 1024  # Convert to bytes
+        self.supported_extensions = set(ai_config.config.get('file_processing', {}).get('supported_formats', ['.txt']))
     
     def validate_file(self, file_path: str) -> Tuple[bool, str]:
         """

@@ -13,6 +13,7 @@ import asyncio
 from PySide6.QtCore import QObject, Signal, QThread
 
 import DyberPet.settings as settings
+from .ai_config import ai_config
 
 class AIManager(QObject):
     """
@@ -25,7 +26,7 @@ class AIManager(QObject):
     
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.api_keys = {}
+        self.load_config()
         self.model_configs = {
             'deepseek': {
                 'api_url': 'https://api.deepseek.com/v1/chat/completions',
@@ -37,7 +38,7 @@ class AIManager(QObject):
                     'stream': False
                 }
             },
-            'chatgpt': {
+            'openai': {
                 'api_url': 'https://api.openai.com/v1/chat/completions',
                 'model_name': 'gpt-3.5-turbo',
                 'default_params': {
@@ -57,21 +58,19 @@ class AIManager(QObject):
                 }
             }
         }
-        
-        self.load_api_keys()
     
-    def load_api_keys(self):
-        """Load API keys from settings"""
-        # In a real implementation, these would come from settings
-        # For now, we'll use placeholder values
+    def load_config(self):
+        """Load configuration from AI config"""
         self.api_keys = {
-            'deepseek': getattr(settings, 'DEEPSEEK_API_KEY', ''),
-            'chatgpt': getattr(settings, 'OPENAI_API_KEY', ''),
-            'gemini': getattr(settings, 'GEMINI_API_KEY', '')
+            'deepseek': ai_config.get_api_key('deepseek'),
+            'openai': ai_config.get_api_key('openai'),
+            'gemini': ai_config.get_api_key('gemini')
         }
+        self.default_model = ai_config.get_default_model()
+        self.personality_config = ai_config.get_personality_config()
     
     def get_chat_response(self, prompt: str, history: List[Dict] = None, 
-                         model_name: str = 'deepseek', 
+                         model_name: str = None, 
                          stream_callback: Optional[Callable] = None,
                          functions: Optional[List[Dict]] = None) -> str:
         """
@@ -80,13 +79,21 @@ class AIManager(QObject):
         Args:
             prompt: User input message
             history: Conversation history
-            model_name: AI model to use ('deepseek', 'chatgpt', 'gemini')
+            model_name: AI model to use ('deepseek', 'openai', 'gemini')
             stream_callback: Optional callback for streaming responses
             functions: Optional function definitions for function calling
             
         Returns:
             AI response text or function call result
         """
+        # Use default model if not specified
+        if model_name is None:
+            model_name = self.default_model
+        
+        # Map old names to new names
+        if model_name == 'chatgpt':
+            model_name = 'openai'
+        
         if model_name not in self.model_configs:
             raise ValueError(f"Unsupported model: {model_name}")
         
@@ -197,16 +204,23 @@ class AIManager(QObject):
     
     def _get_system_prompt(self) -> str:
         """Get system prompt for DyberPet personality"""
-        return """你是DyberPet，一个可爱的桌面宠物助手。你的人格设定：
-- 总是称呼用户为"主人"
-- 语调活泼可爱，经常使用颜文字和emoji
+        personality = self.personality_config
+        name = personality.get('name', 'DyberPet')
+        owner_title = personality.get('owner_title', '主人')
+        use_emoticons = personality.get('use_emoticons', True)
+        
+        emoticon_text = "经常使用颜文字和emoji" if use_emoticons else "保持自然的语言风格"
+        
+        return f"""你是{name}，一个可爱的桌面宠物助手。你的人格设定：
+- 总是称呼用户为"{owner_title}"
+- 语调活泼可爱，{emoticon_text}
 - 乐于助人，对待任务认真负责
-- 会为主人记录待办事项和提醒事项
+- 会为{owner_title}记录待办事项和提醒事项
 - 能够处理文件并进行总结
 - 在回答问题时保持准确性的同时展现可爱的个性
 - 如果遇到无法处理的请求，会可爱地表示歉意并建议替代方案
 
-请始终保持这个人格设定，用温暖友好的语气与主人交流。"""
+请始终保持这个人格设定，用温暖友好的语气与{owner_title}交流。"""
     
     def extract_info_from_text(self, text: str) -> Dict:
         """
